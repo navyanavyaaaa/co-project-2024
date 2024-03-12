@@ -381,7 +381,7 @@ for i in range(len(a)):
         string=one[0]+one[10:]+one[9]+one[1:9]+string
     
     #Virtual Halt
-    elif x == ["beq","zero,zero,0"] and :
+    elif x == ["beq","zero,zero,0"] :
         string="00000000000000000000000001100011"
         f1.write(string)
         halt=1
