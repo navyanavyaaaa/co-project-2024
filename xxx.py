@@ -202,7 +202,11 @@ for i in a:
             three=one[5:12]
 
         string='010'+two+string
-        operandsother[1]=operandsother[1][:2]
+        if len(operandsother[1]) >= 2:
+            operandsother[1] = operandsother[1][:2]
+        else:
+            print("Invalid operandsother[1]") 
+
         if operandsother[1] in registers:
             string=registers[operandsother[1]]+string
         else:
