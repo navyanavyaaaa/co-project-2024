@@ -45,7 +45,7 @@ for i in a:
             operands=x[1].split(',')
             if operands[0] in registers:
                 string=registers[operands[0]]+string
-                if int(operands[0])>0:
+                if int(operands[1])>0:
                     two=bin(int(operands[1]))[2:]
                     if len(two)<20:
                         string='0'*(20-len(two))+str(two)+string
@@ -66,7 +66,7 @@ for i in a:
             operands=x[1].split(',')
             if operands[0] in registers:
                 string=registers[operands[0]]+string
-                if int(operands[0])>0:
+                if int(operands[1])>0:
                     two=bin(int(operands[1]))[2:]
                     if len(two)<20:
                         string='0'*(20-len(two))+str(two)+string
@@ -185,7 +185,7 @@ for i in a:
     elif x[0] in s_type:
         string='0100011'
         operands=x[1].split(',')
-        operandsother=operands.split('(')
+        operandsother=operands[1].split('(')
         if int(operandsother[0])>0:
             one=bin(int(operandsother[0]))[2:]
             if len(one)<12:
