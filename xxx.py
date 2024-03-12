@@ -61,25 +61,25 @@ for i in a:
                 print('Invalid Register Type')
 
         elif x[0]=='auipc':
-            if x[0]=='lui':
-                string+='0010111'
-                operands=x[1].split(',')
-                if operands[0] in registers:
-                    string=registers[operands[0]]+string
-                    if int(operands[0])>0:
-                        two=bin(int(operands[1]))[2:]
-                        if len(two)<20:
-                            string='0'*(20-len(two))+str(two)+string
-                        else:
-                            string=str(two)+string
+            
+            string+='0010111'
+            operands=x[1].split(',')
+            if operands[0] in registers:
+                string=registers[operands[0]]+string
+                if int(operands[0])>0:
+                    two=bin(int(operands[1]))[2:]
+                    if len(two)<20:
+                        string='0'*(20-len(two))+str(two)+string
                     else:
-                        two=bin(int(operands[1]))[3:]
-                        if len(two)<20:
-                            string='1'*(20-len(two))+str(two)+string
-                        else:
-                            string=str(two)+string
+                        string=str(two)+string
                 else:
-                    print('Invalid Register Type')
+                    two=bin(int(operands[1]))[3:]
+                    if len(two)<20:
+                        string='1'*(20-len(two))+str(two)+string
+                    else:
+                        string=str(two)+string
+            else:
+                print('Invalid Register Type')
         else:
             print('Invalid Register Type')
 
