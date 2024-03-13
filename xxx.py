@@ -539,7 +539,9 @@ try:
             else:
                 print("Invalid Label Name-",i)
                 break
-        
+        else:
+            print("Wrong Instruction-",i)
+            break
         
         
         #commiting to output file
