@@ -7,9 +7,13 @@ u_type=["lui","auipc"]
 
 registers= dictionary={"zero":"00000","ra":"00001","sp":"00010","gp":"00011","tp":"00100","t0":"00101","t1":"00110","t2":"00111","fp":"01000","s0":"01000","s1":"01001","a0":"01010","a1":"01011","a2":"01100","a3":"01101","a4":"01110","a5":"01111","a6":"10000","a7":"10001","s2":"10010","s3":"10011","s4":"10100","s5":"10101","s6":"10110","s7":"10111","s8":"11000","s9":"11001","s10":"11010","s11":"11011","t3":"11100","t4":"11101","t5":"11110","t6":"11111"}
 
-f=open("errorGen5.txt", "r")
+import sys
+
+input_=sys.argv[1]
+output_=sys.argv[2]
+f=open(input_, "r")
 a=f.readlines()
-f1=open("bin.txt", "w")
+f1=open(output_, "w")
 l_labels={}
 halt=False
 
@@ -294,54 +298,45 @@ try:
         elif x[0] in s_type:
             string='0100011'
             operands=x[1].split(',')
-            operandsother=operands[1].split('(')
-            if int(operandsother[0])>0:
-                one=str(bin(int(operandsother[0])))[2:]
-                if len(one)<12:
-                    one=str(one)
-                    one='0'* (12-len(one))+str(one)
-                two=one[0:7]
-                three=one[7:12]
-                
-            else:
-                imme=str(bin(int(operandsother[0])))            
-                imme="0"+imme[3:]
-                imme_=''
-                for j in imme:
-                    if j=="0":
-                        imme_+="1"
-                    else:
-                        imme_+="0"
-                imme=imme_;imme_='';c=1
-                for k in range(len(imme)-1,-1,-1):
-                    if (int(imme[k])+c) ==2:
-                        imme_='0'+imme_
-                        c=1
-                    elif (int(imme[k])+c) ==1:
-                        imme_ ='1'+imme_
-                        c=0
-                    else:
-                        imme_ = '0' +imme_
-                        c=0           
-                one=imme_
-                if len(one)<12:
-                    one=str(one)
-                    one='1'* (12-len(one))+one
-                two=one[0:7]
-                three=one[7:12]
-
-            string='010'+three+string
-            operandsother[1]=operandsother[1][:2]
-            if operandsother[1] in registers:
-                string=registers[operandsother[1]]+string
-            else:
-                print("Invalid Register Type-",i)
-                break
             if operands[0] in registers:
-                string=two+registers[operands[0]]+string
+                if operands[1].split("(")[1][:-1] in registers:
+                    imme=str(bin(int(operands[1].split("(")[0])))
+                    
+                    if imme[0]=="-":
+                        imme="0"+imme[3:]
+                        imme_=''
+                        for j in imme:
+                            if j=="0":
+                                imme_+="1"
+                            else:
+                                imme_+="0"
+                        imme=imme_;imme_='';c=1
+                        for k in range(len(imme)-1,-1,-1):
+                            if (int(imme[k])+c) ==2:
+                                imme_='0'+imme_
+                                c=1
+                            elif (int(imme[k])+c) ==1:
+                                imme_ ='1'+imme_
+                                c=0
+                            else:
+                                imme_ = '0' +imme_
+                                c=0
+                    
+                        imme=imme_
+                        ext="1"
+                    elif imme[0]=="0":
+                        ext="0"
+                        imme=imme[2:]
+                    imme = (ext*12) + imme +"0"
+                    imme = imme[-13:-1]
+                    
+                    string= imme[:-5] + registers[operands[0]] + registers[operands[1].split("(")[1][:-1]] + "010" + imme[-5:]+ string
+                    
+                else:
+                    print("Invalid Register Type-",i)
             else:
-                print("Invalid Register Type-",i)
-                break
+                print("Invlaid Register Type-",i)
+                
         
         
         elif x[0] in j_type and isnum(x[1].split(",")[1]):
@@ -397,6 +392,7 @@ try:
                 print("Invalid Register Type-",i)
                 break
             label=operands[1]
+
             if label in l_labels:
                 diff= l_labels[label] -i
                 imme=str(bin(diff))
