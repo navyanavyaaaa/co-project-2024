@@ -3,7 +3,6 @@ def bin_to_decimal(bin_str):
     decimal_value = int(bin_str, 2)
     if is_negative:
         decimal_value = decimal_value - 2 ** 32
-    print(decimal_value)
     return decimal_value
     
 def dec_to_twos_comp(decimal, bits):
@@ -55,7 +54,6 @@ def bin_to_decimal(bin_str):
     decimal_value = int(bin_str, 2)
     if is_negative:
         decimal_value = decimal_value - 2 ** 12
-    print("Decimal value:", decimal_value)
     return decimal_value
 
 def shift(i,n,d):
@@ -68,20 +66,55 @@ def shift(i,n,d):
         a=a[(-1)*leng::]
     return a
 
-registers= {"00000":"0","00001":"0","00010":"0","00011":"0","00100":"0","00101":"0","00110":"0","00111":"0",
+registers= {"00000":"0","00001":"0","00010":"100000000","00011":"0","00100":"0","00101":"0","00110":"0","00111":"0",
             "01000":"0","01001":"0","01010":"0","01011":"0","01100":"0","01101":"0","01110":"0","01111":"0",
             "10000":"0","10001":"0","10010":"0","10011":"0","10100":"0","10101":"0","10110":"0","10111":"0",
             "11000":"0","11001":"0","11010":"0","11011":"0","11100":"0","11101":"0","11110":"0","11111":"0"}
 
-f=open("bin.txt", "r")
+data_mem={"0x00010000":"0b00000000000000000000000000000000",
+          "0x00010004":"0b00000000000000000000000000000000",
+          "0x00010008":"0b00000000000000000000000000000000",
+          "0x0001000c":"0b00000000000000000000000000000000",
+"0x00010010":"0b00000000000000000000000000000000",
+"0x00010014":"0b00000000000000000000000000000000",
+"0x00010018":"0b00000000000000000000000000000000",
+"0x0001001c":"0b00000000000000000000000000000000",
+"0x00010020":"0b00000000000000000000000000000000",
+"0x00010024":"0b00000000000000000000000000000000",
+"0x00010028":"0b00000000000000000000000000000000",
+"0x0001002c":"0b00000000000000000000000000000000",
+"0x00010030":"0b00000000000000000000000000000000",
+"0x00010034":"0b00000000000000000000000000000000",
+"0x00010038":"0b00000000000000000000000000000000",
+"0x0001003c":"0b00000000000000000000000000000000",
+"0x00010040":"0b00000000000000000000000000000000",
+"0x00010044":"0b00000000000000000000000000000000",
+"0x00010048":"0b00000000000000000000000000000000",
+"0x0001004c":"0b00000000000000000000000000000000",
+"0x00010050":"0b00000000000000000000000000000000",
+"0x00010054":"0b00000000000000000000000000000000",
+"0x00010058":"0b00000000000000000000000000000000",
+"0x0001005c":"0b00000000000000000000000000000000",
+"0x00010060":"0b00000000000000000000000000000000",
+"0x00010064":"0b00000000000000000000000000000000",
+"0x00010068":"0b00000000000000000000000000000000",
+"0x0001006c":"0b00000000000000000000000000000000",
+"0x00010070":"0b00000000000000000000000000000000",
+"0x00010074":"0b00000000000000000000000000000000",
+"0x00010078":"0b00000000000000000000000000000000",
+"0x0001007c":"0b00000000000000000000000000000000"}
+
+
+f=open("s_test1.txt", "r")
 a=f.readlines()
-f1=open("bin.txt", "w")
+a1=open("bin.txt", "w")
 
 PC=0
 jump=False
 while PC < len(a):
     
-    opcode= a[PC][-7::]
+    a[PC]=a[PC].split()[0]
+    opcode= a[PC][-7:]
     
     
     ##btype
@@ -89,13 +122,16 @@ while PC < len(a):
         func3= a[PC][-15:-12]
         rs1=registers[a[PC][-20:-15]]
         rs2=registers[a[PC][-25:-20]]
-        imm1=a[-12:-7]
-        imm2=a[-32:-25]
+        imm1=a[PC][-12:-7]
+        imm2=a[PC][-32:-25]
         imm=imm2[0]+imm1[-1]+imm2[1:]+imm1[:-1]
         n=len(rs1)
         if len(rs1)<len(rs2):
             n=len(rs2)
         
+        if int(rs1,2)==int(rs2,2)==int(imm,2)==0:
+            jump=True
+            break
         ###
         if func3=="000":
             if bin2int(sext(rs1,n))==bin2int(sext(rs2,n)):
@@ -144,23 +180,23 @@ while PC < len(a):
         dec_rs1 = bin_to_decimal(rs1_value)
         address = dec_rs1 + offset
         hex_address = hext(address)
-        data_memory[hex_address] = rs2_value
+        data_mem[hex_address] = "0b"+sext(rs2_value,32)
         
     ##rtype
     if opcode=="0110011":
         
-        func3= a[PC][-15:-12]
-        funct7=a[PC][:8]
-        rs1=registers[a[PC][8:13]]
-        rs2=registers[a[PC][13:18]]
+        funct3= a[PC][-15:-12]
+        funct7=a[PC][:7]
+        rs1=registers[a[PC][7:12]]
+        rs2=registers[a[PC][12:17]]
         dest=a[PC][-12:-7]
         result=False
         
-        if funct3 == "000" and funct7 == "0000000":  # ADD
+        if funct3 == "000" and funct7 == "0000000":# ADD
             result = bin(bin2int(rs1) + bin2int(rs2))
         elif funct3 == "000" and funct7 == "0100000":  # SUB
             result = bin(bin2int(rs1) - bin2int(rs2))
-        elif funct3 == "001":  # SLL
+        elif funct3 == "001": # SLL
             no=int(rs2[-5::],2)
             result=shift(rs1,no,"l")
         elif funct3 == "010":  # SLT
@@ -187,7 +223,7 @@ while PC < len(a):
             no=int(rs2[-5::],2)
             result=shift(rs1,no,"r")
             
-        elif funct3 == "110" : # OR
+        elif funct3 == "110": # OR
             l=len(rs1)
             result=""
             if len(rs2)>l:
@@ -200,7 +236,7 @@ while PC < len(a):
                 else:
                     result+="1"
                     
-        elif funct3 == "111" : # AND
+        elif funct3 == "111":  # AND
             l=len(rs1)
             result=""
             if len(rs2)>l:
@@ -212,7 +248,11 @@ while PC < len(a):
                     result+="1"
                 else:
                     result+="0"
-        registers[dest]=result
+                    
+        if result!=False:
+            registers[dest]=result
+        else:
+            print(funct3,funct7,a[PC][8:13],a[PC][13:18],dest)
     ##utype
     if opcode=="0110111":
         
@@ -230,13 +270,16 @@ while PC < len(a):
         
     
     ##itype
+    
     if opcode=="0010011":
         rd=a[PC][-12:-7]
         func3=a[PC][15:-12]
         rs1=a[PC][-20:-15]
         imm=a[PC][:-20]
         
+        
         if func3=="000":
+            
             dec=register[rs1]+bin2int(imm)
             registers[rd]=dec_to_twos_comp(dec,32)
             
@@ -252,7 +295,7 @@ while PC < len(a):
             dec_rs = bin_to_decimal(rs_value)
             address = dec_rs + offset
             hex_address = hext(address)
-            register[binary_inst[20:25]]=data_mem[hex_address]
+            registers[binary_inst[20:25]]=data_mem[hex_address]
     
     if opcode=="1100111":
         registers[rd]= sext("0"+bin(PC+4)[2:],32)
@@ -260,9 +303,21 @@ while PC < len(a):
         
         
     ##writing registers:
-    a1.write(bin(PC+1))
-    for i in registers:
-        a1.write(" "+"0b"+sext(registers[i],32))
-    a1.write("/n")
-    PC+=1
+    if jump==True:
+        break
     
+    a1.write("0b"+sext("0"+bin(PC+1)[2:]+'00',32))
+    for i in registers:
+        print(i,":",registers[i],",",end='')
+        a1.write(" "+"0b"+sext("0"+registers[i],32))
+    print()
+    a1.write("\n")
+    PC+=1
+if jump==True:
+    a1.write("0b"+sext("0"+bin(PC+1)[2:]+"00",32))
+    for i in registers:
+        a1.write(" "+"0b"+sext("0"+registers[i],32))
+    a1.write("\n")
+for i in data_mem:
+    a1.write(i+":"+data_mem[i]+"\n")
+a1.close()
