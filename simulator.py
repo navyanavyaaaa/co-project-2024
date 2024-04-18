@@ -304,9 +304,9 @@ while PC < len(a):
     
     a1.write("0b"+sext("0"+bin(PC+1)[2:]+'00',32))
     for i in registers:
-        print(i,":",registers[i],",",end='')
+        
         a1.write(" "+"0b"+sext("0"+registers[i],32))
-    print()
+    
     a1.write("\n")
     PC+=1
 if jump==True:
