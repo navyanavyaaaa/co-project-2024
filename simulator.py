@@ -170,17 +170,14 @@ while PC < len(a):
     ##stype
     if opcode=="0100011":
         
-        binary_inst = a[PC]
-        immediate_string = 20 * binary_inst[0] + binary_inst[:7] + binary_inst[-12:-7]
-
-        offset = bin_to_decimal(immediate_string)
-        rs1_value = registers[binary_inst[12:17]]
-        rs2_value = registers[binary_inst[7:12]]
-
-        dec_rs1 = bin_to_decimal(rs1_value)
-        address = dec_rs1 + offset
+        inst=a[PC]
+        imm=inst[0:7]+inst[-12:-7]
+        rs2=inst[7:12]
+        rs1=registers[inst[-20:-15]]
+        address = bin2int(rs1)+bin2int(imm)
+        
         hex_address = hext(address)
-        data_mem[hex_address] = "0b"+sext(rs2_value,32)
+        data_mem[hex_address] = "0b"+sext(rs2,32)
         
     ##rtype
     if opcode=="0110011":
@@ -193,7 +190,7 @@ while PC < len(a):
         result=False
         
         if funct3 == "000" and funct7 == "0000000":# ADD
-            result = bin(bin2int(rs1) + bin2int(rs2))
+            result = bin(bin2int(rs1) + bin2int(rs2))[2:]
         elif funct3 == "000" and funct7 == "0100000":  # SUB
             result = bin(bin2int(rs1) - bin2int(rs2))
         elif funct3 == "001": # SLL
@@ -252,7 +249,7 @@ while PC < len(a):
         if result!=False:
             registers[dest]=result
         else:
-            print(funct3,funct7,a[PC][8:13],a[PC][13:18],dest)
+            print("Invalid Input")
     ##utype
     if opcode=="0110111":
         
@@ -272,15 +269,16 @@ while PC < len(a):
     ##itype
     
     if opcode=="0010011":
+        
         rd=a[PC][-12:-7]
-        func3=a[PC][15:-12]
+        func3=a[PC][-15:-12]
         rs1=a[PC][-20:-15]
         imm=a[PC][:-20]
         
         
         if func3=="000":
             
-            dec=register[rs1]+bin2int(imm)
+            dec=bin2int(registers[rs1])+bin2int(imm)
             registers[rd]=dec_to_twos_comp(dec,32)
             
         elif func3=="011":
@@ -288,14 +286,12 @@ while PC < len(a):
                 registers[rd]="1"
                 
     if opcode=="0000011":
-        if binary_inst[17:20] == "010" and binary_inst[25:32] == "0000011":
-            offset = bin_to_decimal(immediate_string)
-            rs_value = registers[binary_inst[12:17]]
-            rd_value = registers[binary_inst[20:25]]
-            dec_rs = bin_to_decimal(rs_value)
+        if func3 == "010":
+            offset = bin2int(imm)
+            dec_rs = bin2int(rs1)
             address = dec_rs + offset
             hex_address = hext(address)
-            registers[binary_inst[20:25]]=data_mem[hex_address]
+            registers[rd]=data_mem[hex_address]
     
     if opcode=="1100111":
         registers[rd]= sext("0"+bin(PC+4)[2:],32)
