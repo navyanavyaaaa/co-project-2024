@@ -160,17 +160,17 @@ while PC < len(a):
             result = bin(bin2int(rs1) + bin2int(rs2))
         elif funct3 == "000" and funct7 == "0100000":  # SUB
             result = bin(bin2int(rs1) - bin2int(rs2))
-        elif funct3 == "001"  # SLL
+        elif funct3 == "001":  # SLL
             no=int(rs2[-5::],2)
             result=shift(rs1,no,"l")
-        elif funct3 == "010"  # SLT
+        elif funct3 == "010":  # SLT
             if bin2int(rs1)<bin2int(rs2):
                 result= "1"
-        elif funct3 == "011"  # SLTU
+        elif funct3 == "011":  # SLTU
             if int(rs1)<int(rs2):
                 result= "1"
                 
-        elif funct3 == "100"  # XOR
+        elif funct3 == "100":  # XOR
             l=len(rs1)
             result=""
             if len(rs2)>l:
@@ -183,11 +183,11 @@ while PC < len(a):
                 else:
                     result+="1"
             
-        elif funct3 == "101"  # SRL
+        elif funct3 == "101":  # SRL
             no=int(rs2[-5::],2)
             result=shift(rs1,no,"r")
             
-        elif funct3 == "110"  # OR
+        elif funct3 == "110" : # OR
             l=len(rs1)
             result=""
             if len(rs2)>l:
@@ -200,7 +200,7 @@ while PC < len(a):
                 else:
                     result+="1"
                     
-        elif funct3 == "111"  # AND
+        elif funct3 == "111" : # AND
             l=len(rs1)
             result=""
             if len(rs2)>l:
@@ -220,7 +220,7 @@ while PC < len(a):
         des=a[PC][30:-7]
         registers[des]=bin(PC+ bin2int(r))[2:]
         
-    if opcode==0010111:
+    if opcode=="0010111":
         
         binary_inst=a[PC]
         
